@@ -9,13 +9,19 @@ import shutil
 import os
 
 def archive_all(takeout_dir, archive_dir, dry_run=True):
+    trace_verbose(
+        ">>> archive_all(takeout_dir=%s, archive_dir=%s, dry_run=%s) <<<" % 
+        (takeout_dir, archive_dir, dry_run)
+    )
+
     for dirpath, dirs, files in os.walk(takeout_dir):
         trace_verbose(" + source: %s" % dirpath)
 
         for dir in dirs:
             archive_all(
                 takeout_dir=os.path.join(dirpath, dir), 
-                archive_dir=archive_dir
+                archive_dir=archive_dir,
+                dry_run=dry_run
             )
         
         for file in files:
