@@ -2,8 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
+import hashlib
 import json
 import pathlib
+import shutil
 import os
 
 def archive_all(takeout_dir, archive_dir, dry_run=True):
@@ -51,18 +53,60 @@ def archive_file(file, file_json, archive_dir, dry_run=True):
         return
     
     taken_time = datetime.fromtimestamp(int(data['photoTakenTime']['timestamp']))
+    
+    archive_target_dir = create_archive_dir(
+        archive_dir=archive_dir, 
+        taken_time=taken_time, 
+        dry_run=dry_run
+    )
 
-    # TODO: Estamos por aqui...
+    trace_verbose("   * archive_dir: %s" % archive_dir)
 
-"""
-# taken_time = datetime.datetime(2024, 3, 3, 9, 50, 28)
->>> taken_time.year
-2024
->>> taken_time.month
-3
->>> taken_time.day
-3
-"""
+    move_file(file, archive_target_dir, dry_run=dry_run)
+    move_file(file_json, archive_target_dir, dry_run=dry_run)
+
+def move_file(file, archive_target_dir, dry_run=True):
+    file_basename = os.path.basename(file)
+    archive_target_file = os.path.join(archive_target_dir, file_basename)
+
+    trace_verbose("   * move_file: %s" % archive_target_file)
+
+    if not os.path.exists(archive_target_file):
+        if dry_run:
+            print('>>> shutil.move(%s, %s)' % (file, archive_target_dir))
+        else:
+            shutil.move(file, archive_target_dir)
+    else:
+        print("WARNING: %s already exists" % archive_target_file)
+        file_sha1 = calculate_sha1(file)
+        archive_target_file_sha1 = calculate_sha1(archive_target_file)
+        
+        print("WARNING: %s with %s SHA1 than %s" % (
+            archive_target_file, 
+            'DIFERENT' if file_sha1 == archive_target_file_sha1 else 'same', 
+            file
+        ))
+
+def calculate_sha1(file):
+    openedFile = open(file, 'rb')
+    readFile = openedFile.read()
+    return hashlib.sha1(readFile).hexdigest()
+
+def create_archive_dir(archive_dir, taken_time, dry_run=True):
+    def create_dir_if_not_exists(path):
+        if not os.path.exists(path):
+            if dry_run:
+                print('>>> os.mkdir(%s)' % path)
+            else:
+                os.mkdir(path)
+
+    create_dir_if_not_exists(archive_dir)
+
+    archive_dir = os.path.join(archive_dir, taken_time.strftime('%Y'))
+    create_dir_if_not_exists(archive_dir)
+
+    archive_dir = os.path.join(archive_dir, taken_time.strftime('%m'))
+    create_dir_if_not_exists(archive_dir)
 
 def trace_verbose(text):
     if __debug__:
