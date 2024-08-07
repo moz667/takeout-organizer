@@ -108,6 +108,8 @@ def create_archive_dir(archive_dir, taken_time, dry_run=True):
     archive_dir = os.path.join(archive_dir, taken_time.strftime('%m'))
     create_dir_if_not_exists(archive_dir)
 
+    return archive_dir
+
 def trace_verbose(text):
     if __debug__:
         print(text)

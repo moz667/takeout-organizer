@@ -4,6 +4,7 @@
 import getopt
 import os
 import sys
+from takeout_organizer import archive_all
 
 __location__ = os.path.realpath(
     os.path.join(os.getcwd(), os.path.dirname(__file__))
@@ -35,7 +36,11 @@ def main(argv):
         print_help()
         sys.exit(2)
 
-
+    archive_all(
+        takeout_dir=takeout_directory, 
+        archive_dir=archive_directory, 
+        dry_run=dry_run
+    )
 
     sys.exit(0)
 
