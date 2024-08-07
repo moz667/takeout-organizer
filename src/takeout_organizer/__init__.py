@@ -83,7 +83,7 @@ def move_file(file, archive_target_dir, dry_run=True):
         
         print("WARNING: %s with %s SHA1 than %s" % (
             archive_target_file, 
-            'DIFERENT' if file_sha1 == archive_target_file_sha1 else 'same', 
+            'DIFERENT' if file_sha1 != archive_target_file_sha1 else 'same', 
             file
         ))
 
