@@ -145,6 +145,8 @@ def create_dir_if_not_exists(path, dry_run=True):
             print(">>> os.mkdir('%s')" % path)
         else:
             os.mkdir(path)
+    
+    return path
 
 def trace_verbose(text):
     if __debug__:
