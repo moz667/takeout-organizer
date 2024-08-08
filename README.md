@@ -2,6 +2,8 @@
 
 Another script to organize google photos takeout data.
 
+What really do is simple: Take an extracted takeout google photos dir (`-i` argument) and move to a grouped dir estructure (`-o` argument) by year and month of the media (`year/month`).
+
 ## Requeriments
 
 ```bash
