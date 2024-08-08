@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
+from enum import Enum
 import json
 import pathlib
 import shutil
@@ -41,6 +42,14 @@ def archive_all(takeout_dir, archive_dir, dry_run=True):
             cur_file_json = os.path.join(dirpath, file + '.json')
             if not os.path.isfile(cur_file_json):
                 print("WARNING: %s not found" % cur_file_json)
+
+                archive_target_dir_no_json = create_dir_if_not_exists(
+                    os.path.join(archive_dir, 'no-json-data'), dry_run=dry_run
+                )
+
+                move_file(
+                    cur_file, archive_target_dir_no_json, dry_run=dry_run
+                )
                 continue
             
             archive_file(
@@ -69,8 +78,23 @@ def archive_file(file, file_json, archive_dir, dry_run=True):
 
     trace_verbose("   * archive_dir: %s" % archive_dir)
 
-    move_file(file, archive_target_dir, dry_run=dry_run)
+    return_move_file = move_file(file, archive_target_dir, dry_run=dry_run)
+
+    if return_move_file == MoveFileReturn.DIFERENT_CHECKSUM:
+        archive_target_dir = create_dir_if_not_exists(
+            os.path.join(archive_dir, 'duplicates-diferent-checksum'), dry_run=dry_run
+        )
+
+        move_file(
+            file, archive_target_dir, dry_run=dry_run
+        )
+        
     move_file(file_json, archive_target_dir, dry_run=dry_run)
+
+class MoveFileReturn(Enum):
+    OK = 0
+    ALREADY_EXISTS = 1
+    DIFERENT_CHECKSUM = 2
 
 def move_file(file, archive_target_dir, dry_run=True):
     file_basename = os.path.basename(file)
@@ -84,35 +108,43 @@ def move_file(file, archive_target_dir, dry_run=True):
         else:
             shutil.move(file, archive_target_dir)
     else:
-        print("WARNING: Can't move '%s' to '%s' already exists" % (
-            file, archive_target_file
-        ))
         file_checksum = get_checksum(file)
         archive_target_file_checksum = get_checksum(archive_target_file)
         
-        if file_checksum != archive_target_file_checksum:
-            print("WARNING: '%s' with DIFERENT checksum than '%s'" % (
+        if file_checksum == archive_target_file_checksum:
+            print("WARNING: Can't move '%s' to '%s', already exists" % (
+                file, archive_target_file
+            ))
+
+            return MoveFileReturn.ALREADY_EXISTS
+        else:
+            print("WARNING: Can't move '%s' to '%s', already exists and has DIFERENT checksum!" % (
                 archive_target_file, 
                 file
             ))
 
-def create_archive_dir(archive_dir, taken_time, dry_run=True):
-    def create_dir_if_not_exists(path):
-        if not os.path.exists(path):
-            if dry_run:
-                print(">>> os.mkdir('%s')" % path)
-            else:
-                os.mkdir(path)
+            return MoveFileReturn.DIFERENT_CHECKSUM
+    
+    return MoveFileReturn.OK
+    
 
-    create_dir_if_not_exists(archive_dir)
+def create_archive_dir(archive_dir, taken_time, dry_run=True):
+    create_dir_if_not_exists(archive_dir, dry_run)
 
     archive_dir = os.path.join(archive_dir, taken_time.strftime('%Y'))
-    create_dir_if_not_exists(archive_dir)
+    create_dir_if_not_exists(archive_dir, dry_run)
 
     archive_dir = os.path.join(archive_dir, taken_time.strftime('%m'))
-    create_dir_if_not_exists(archive_dir)
+    create_dir_if_not_exists(archive_dir, dry_run)
 
     return archive_dir
+
+def create_dir_if_not_exists(path, dry_run=True):
+    if not os.path.exists(path):
+        if dry_run:
+            print(">>> os.mkdir('%s')" % path)
+        else:
+            os.mkdir(path)
 
 def trace_verbose(text):
     if __debug__:
