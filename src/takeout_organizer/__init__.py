@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-import hashlib
 import json
 import pathlib
 import shutil
 import os
+
+from simple_file_checksum import get_checksum
 
 def archive_all(takeout_dir, archive_dir, dry_run=True):
     trace_verbose(
@@ -84,19 +85,14 @@ def move_file(file, archive_target_dir, dry_run=True):
             shutil.move(file, archive_target_dir)
     else:
         print("WARNING: %s already exists" % archive_target_file)
-        file_sha1 = calculate_sha1(file)
-        archive_target_file_sha1 = calculate_sha1(archive_target_file)
+        file_checksum = get_checksum(file)
+        archive_target_file_checksum = get_checksum(archive_target_file)
         
-        print("WARNING: %s with %s SHA1 than %s" % (
-            archive_target_file, 
-            'DIFERENT' if file_sha1 != archive_target_file_sha1 else 'same', 
-            file
-        ))
-
-def calculate_sha1(file):
-    openedFile = open(file, 'rb')
-    readFile = openedFile.read()
-    return hashlib.sha1(readFile).hexdigest()
+        if file_checksum != archive_target_file_checksum:
+            print("WARNING: %s with DIFERENT checksum than %s" % (
+                archive_target_file, 
+                file
+            ))
 
 def create_archive_dir(archive_dir, taken_time, dry_run=True):
     def create_dir_if_not_exists(path):
