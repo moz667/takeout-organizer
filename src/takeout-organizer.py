@@ -46,8 +46,8 @@ def main(argv):
     sys.exit(0)
 
 def print_help():
-    print('takeout-organizer.py -i <takeout_directory> -o <archive_directory>')
-    print('takeout-organizer.py --idir=<takeout_directory> --odir=<archive_directory>')
+    print('takeout-organizer.py -i <takeout_directory> -o <archive_directory> [--dry_run]')
+    print('takeout-organizer.py --idir=<takeout_directory> --odir=<archive_directory> [--dry_run]')
 
 if __name__ == "__main__":
    main(sys.argv[1:])
