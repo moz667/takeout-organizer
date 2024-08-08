@@ -56,7 +56,7 @@ def archive_file(file, file_json, archive_dir, dry_run=True):
 
     if not 'photoTakenTime' in data or \
         not 'timestamp' in data['photoTakenTime']:
-        print("WARNING: %s dont have photoTakenTime/timestamp" % file_json)
+        print("WARNING: '%s' dont have photoTakenTime/timestamp" % file_json)
         return
     
     taken_time = datetime.fromtimestamp(int(data['photoTakenTime']['timestamp']))
@@ -80,16 +80,18 @@ def move_file(file, archive_target_dir, dry_run=True):
 
     if not os.path.exists(archive_target_file):
         if dry_run:
-            print('>>> shutil.move(%s, %s)' % (file, archive_target_dir))
+            print(">>> shutil.move('%s', '%s')" % (file, archive_target_dir))
         else:
             shutil.move(file, archive_target_dir)
     else:
-        print("WARNING: %s already exists" % archive_target_file)
+        print("WARNING: Can't move '%s' to '%s' already exists" % (
+            file, archive_target_file
+        ))
         file_checksum = get_checksum(file)
         archive_target_file_checksum = get_checksum(archive_target_file)
         
         if file_checksum != archive_target_file_checksum:
-            print("WARNING: %s with DIFERENT checksum than %s" % (
+            print("WARNING: '%s' with DIFERENT checksum than '%s'" % (
                 archive_target_file, 
                 file
             ))
@@ -98,7 +100,7 @@ def create_archive_dir(archive_dir, taken_time, dry_run=True):
     def create_dir_if_not_exists(path):
         if not os.path.exists(path):
             if dry_run:
-                print('>>> os.mkdir(%s)' % path)
+                print(">>> os.mkdir('%s')" % path)
             else:
                 os.mkdir(path)
 
