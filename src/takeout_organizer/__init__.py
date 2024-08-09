@@ -4,13 +4,18 @@
 from datetime import datetime
 from enum import Enum
 import json
+import os
 import pathlib
 import shutil
-import os
+from tempfile import gettempdir
 
 from simple_file_checksum import get_checksum
 
+CUR_EXECUTION_TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")
+
 def archive_all(takeout_dir, archive_dir, dry_run=True):
+    CUR_EXECUTION_TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")
+
     trace_verbose(
         ">>> archive_all(takeout_dir=%s, archive_dir=%s, dry_run=%s) <<<" % 
         (takeout_dir, archive_dir, dry_run)
@@ -85,11 +90,15 @@ def archive_file(file, file_json, archive_dir, dry_run=True):
             os.path.join(archive_dir, 'duplicates-diferent-checksum'), dry_run=dry_run
         )
 
-        move_file(
+        return_move_file = move_file(
             file, archive_target_dir, dry_run=dry_run
         )
-        
-    move_file(file_json, archive_target_dir, dry_run=dry_run)
+    
+    log_move_file(file, return_move_file=return_move_file)
+
+    return_move_file = move_file(file_json, archive_target_dir, dry_run=dry_run)
+    log_move_file(file, return_move_file=return_move_file)
+
 
 class MoveFileReturn(Enum):
     OK = 0
@@ -126,6 +135,17 @@ def move_file(file, archive_target_dir, dry_run=True):
             return MoveFileReturn.DIFERENT_CHECKSUM
     
     return MoveFileReturn.OK
+
+def log_move_file(file, return_move_file):
+    base_filename = 'takeout-organizer_%s.log' % CUR_EXECUTION_TIMESTAMP
+
+    if return_move_file == MoveFileReturn.ALREADY_EXISTS:
+        base_filename = 'takeout-organizer_already-exists_%s.log'
+    elif return_move_file == MoveFileReturn.DIFERENT_CHECKSUM:
+        base_filename = 'takeout-organizer_diferent-checksum_%s.log'
+    
+    with open(os.path.join(gettempdir(), base_filename), 'w+') as log:
+        log.write(file)
     
 
 def create_archive_dir(archive_dir, taken_time, dry_run=True):
