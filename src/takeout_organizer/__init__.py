@@ -140,12 +140,12 @@ def log_move_file(file, return_move_file):
     base_filename = 'takeout-organizer_%s.log' % CUR_EXECUTION_TIMESTAMP
 
     if return_move_file == MoveFileReturn.ALREADY_EXISTS:
-        base_filename = 'takeout-organizer_already-exists_%s.log'
+        base_filename = 'takeout-organizer_already-exists_%s.log' % CUR_EXECUTION_TIMESTAMP
     elif return_move_file == MoveFileReturn.DIFERENT_CHECKSUM:
-        base_filename = 'takeout-organizer_diferent-checksum_%s.log'
+        base_filename = 'takeout-organizer_diferent-checksum_%s.log' % CUR_EXECUTION_TIMESTAMP
     
-    with open(os.path.join(gettempdir(), base_filename), 'w+') as log:
-        log.write(file)
+    with open(os.path.join(gettempdir(), base_filename), 'a') as log:
+        log.write("%s\n" % file)
     
 
 def create_archive_dir(archive_dir, taken_time, dry_run=True):
