@@ -97,7 +97,7 @@ def archive_file(file, file_json, archive_dir, dry_run=True):
     log_move_file(file, return_move_file=return_move_file)
 
     return_move_file = move_file(file_json, archive_target_dir, dry_run=dry_run)
-    log_move_file(file, return_move_file=return_move_file)
+    log_move_file(file_json, return_move_file=return_move_file)
 
 
 class MoveFileReturn(Enum):
