@@ -52,9 +52,11 @@ def archive_all(takeout_dir, archive_dir, dry_run=True):
                     os.path.join(archive_dir, 'no-json-data'), dry_run=dry_run
                 )
 
-                move_file(
+                return_move_file = move_file(
                     cur_file, archive_target_dir_no_json, dry_run=dry_run
                 )
+
+                log_move_file(cur_file, return_move_file=return_move_file)
                 continue
             
             archive_file(
