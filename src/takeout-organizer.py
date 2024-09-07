@@ -17,7 +17,7 @@ def main(argv):
     dry_run = False
 
     try:
-        opts, args = getopt.getopt(argv,"hi:o:",["idir=","odir=","dry_run"])
+        opts, args = getopt.getopt(argv,"hi:o:",["idir=","odir=","dry-run"])
     except getopt.GetoptError:
         print_help()
         sys.exit(2)
@@ -30,7 +30,7 @@ def main(argv):
             takeout_directory = arg
         elif opt in ("-o", "--odir"):
             archive_directory = arg
-        elif opt in "--dry_run":
+        elif opt in "--dry-run":
             dry_run = True
 
     if takeout_directory == "" or archive_directory == "":
@@ -46,8 +46,8 @@ def main(argv):
     sys.exit(0)
 
 def print_help():
-    print('takeout-organizer.py -i <takeout_directory> -o <archive_directory> [--dry_run]')
-    print('takeout-organizer.py --idir=<takeout_directory> --odir=<archive_directory> [--dry_run]')
+    print('takeout-organizer.py --i=<takeout_directory> --o=<archive_directory> [--dry-run]')
+    print('takeout-organizer.py --idir=<takeout_directory> --odir=<archive_directory> [--dry-run]')
 
 if __name__ == "__main__":
    main(sys.argv[1:])

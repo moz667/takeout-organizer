@@ -33,8 +33,8 @@ python takeout-organizer/src/takeout-organizer.py
 
 ## Arguments
 
-* `-i <takeout-directory>, --idir=<takeout-directory>`, input directory or the directory where the takeout files are.
-* `-o <archive-directory>, --odir=<archive-directory>`, output directory or the directory to archive grouped by year and month the takeout files.
+* `--i=<takeout-directory>, --idir=<takeout-directory>`, input directory or the directory where the takeout files are.
+* `--o=<archive-directory>, --odir=<archive-directory>`, output directory or the directory to archive grouped by year and month the takeout files.
 * `--dry_run`, optional, test de execution. Not move files, only show what are going to do.
 
 ## Python arguments
@@ -59,9 +59,9 @@ In addition of the execution output, there are 3 log files on temporary director
 
 ```bash
 # Simple execution
-python takeout-organizer/src/takeout-organizer.py -i samples/takeout -o samples/archive
+python takeout-organizer/src/takeout-organizer.py --i=samples/takeout --o=samples/archive
 # Less output execution
-python -O takeout-organizer/src/takeout-organizer.py -i samples/takeout -o samples/archive
+python -O takeout-organizer/src/takeout-organizer.py --i=samples/takeout --o=samples/archive
 # Execute test
-python takeout-organizer/src/takeout-organizer.py -i samples/takeout -o samples/archive --dry_run
+python takeout-organizer/src/takeout-organizer.py --i=samples/takeout --o=samples/archive --dry_run
 ```
