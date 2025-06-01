@@ -57,7 +57,7 @@ def archive_all(takeout_dir, archive_dir, dry_run=True):
                     dry_run=dry_run
                 )
             else:
-                print("WARNING: sidecar file not found")
+                print("WARNING: sidecar file not found for '%s/%s'." % (dirpath, file))
 
                 archive_target_dir_no_json = create_dir_if_not_exists(
                     os.path.join(archive_dir, 'no-json-data'), dry_run=dry_run
