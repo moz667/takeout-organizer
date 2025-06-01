@@ -5,6 +5,7 @@ from datetime import datetime
 from enum import Enum
 import json
 import os
+import re
 import pathlib
 import shutil
 from tempfile import gettempdir
@@ -44,9 +45,19 @@ def archive_all(takeout_dir, archive_dir, dry_run=True):
             
             # 2. Si NO existe un archivo que se llame igual que el actual pero 
             # con la extension .json, sacamos mensaje por pantalla y continuamos
-            cur_file_json = os.path.join(dirpath, file + '.json')
-            if not os.path.isfile(cur_file_json):
-                print("WARNING: %s not found" % cur_file_json)
+            sidecar_file = get_sidecar_json_file(dirpath,file)
+            
+            if sidecar_file:
+                sidecar_file = os.path.join(dirpath, sidecar_file)
+
+                archive_file(
+                    file=cur_file, 
+                    file_json=sidecar_file, 
+                    archive_dir=archive_dir, 
+                    dry_run=dry_run
+                )
+            else:
+                print("WARNING: sidecar file not found")
 
                 archive_target_dir_no_json = create_dir_if_not_exists(
                     os.path.join(archive_dir, 'no-json-data'), dry_run=dry_run
@@ -59,12 +70,14 @@ def archive_all(takeout_dir, archive_dir, dry_run=True):
                 log_move_file(cur_file, return_move_file=return_move_file)
                 continue
             
-            archive_file(
-                file=cur_file, 
-                file_json=cur_file_json, 
-                archive_dir=archive_dir, 
-                dry_run=dry_run
-            )
+def get_sidecar_json_file(dirpath, file):
+    pattern = r"%s.*\.json$" % file
+
+    for filename in os.listdir(dirpath):
+        if re.search(pattern, filename):
+            return filename
+
+    return None
 
 def archive_file(file, file_json, archive_dir, dry_run=True):
     with open(file_json) as json_data:
