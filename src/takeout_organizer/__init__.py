@@ -143,8 +143,8 @@ def move_file(file, archive_target_dir, dry_run=True):
             return MoveFileReturn.ALREADY_EXISTS
         else:
             print("WARNING: Can't move '%s' to '%s', already exists and has DIFERENT checksum!" % (
+                file,
                 archive_target_file, 
-                file
             ))
 
             return MoveFileReturn.DIFERENT_CHECKSUM
